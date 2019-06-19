@@ -12,9 +12,9 @@ import (
   prominentcolor "github.com/EdlinOrg/prominentcolor"
 )
 
-// Struct to return data result
-type Colors struct {
-	Colors []string `json:"colors"`
+// An Color represents data result
+type Color struct {
+	Color []string `json:"colors"`
 }
 
 func getImage(data string) (image.Image, error) {
@@ -29,7 +29,7 @@ func getImage(data string) (image.Image, error) {
   return img, nil
 }
 
-func process(img image.Image) Colors {
+func process(img image.Image) Color {
 	resizeSize := uint(prominentcolor.DefaultSize)
 	bgmasks := prominentcolor.GetDefaultMasks()
 
@@ -38,7 +38,7 @@ func process(img image.Image) Colors {
 		log.Println(err)
 	}
 
-	colors := Colors{getColors(res)}
+	colors := Color{getColors(res)}
 
 	return colors
 }
