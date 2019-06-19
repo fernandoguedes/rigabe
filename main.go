@@ -12,7 +12,9 @@ import (
   prominentcolor "github.com/EdlinOrg/prominentcolor"
 )
 
-type Colors []interface{}
+type Colors struct {
+	Colors []string `json:"colors"`
+}
 
 func getImage(data string) (image.Image, error) {
   reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
