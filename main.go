@@ -12,6 +12,7 @@ import (
   prominentcolor "github.com/EdlinOrg/prominentcolor"
 )
 
+// Struct to return data result
 type Colors struct {
 	Colors []string `json:"colors"`
 }
