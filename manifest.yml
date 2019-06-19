@@ -1,0 +1,6 @@
+---
+applications:
+- name: rigabe
+  memory: 128M
+  env:
+    GOPACKAGENAME: rigabe
