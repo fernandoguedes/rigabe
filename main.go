@@ -4,26 +4,17 @@ import (
   "net/http"
   "encoding/base64"
   "io/ioutil"
-  "fmt"
   "log"
   "image"
   _ "image/jpeg"
   "strings"
+  "encoding/json"
   prominentcolor "github.com/EdlinOrg/prominentcolor"
 )
 
-func getRandomString() string {
-  return "teste.jpg"
-}
+type Colors []interface{}
 
 func getImage(data string) (image.Image, error) {
-  //var fileName = getRandomString() 
-
-//  decode, err := base64.StdEncoding.DecodeString(content)
-//  if err != nil {
-//	log.Fatal(err)
-//  }
-
   reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
   img, _, err := image.Decode(reader)
 
@@ -32,60 +23,31 @@ func getImage(data string) (image.Image, error) {
 	return nil, err
   }
 
-  //fmt.Println(img)
-
-  //file, err := os.Create(fileName)
-  //if err != nil {
-  //  log.Fatal(err)
-  //}
-  //defer file.Close()
-
-  //_, err = file.Write(decode)
-  //if err != nil {
-  //  log.Fatal(err)
-  //}
-
-  return img, nil 
+  return img, nil
 }
 
-func processBatch(img image.Image) string {
-	var buff strings.Builder
-	bitarr := []int{
-		prominentcolor.ArgumentAverageMean,
-		prominentcolor.ArgumentDefault,
-	}
-
-	params := 1 
-
-
-//	prefix := fmt.Sprintf("K=%d, ", params)
+func process(img image.Image) Colors {
 	resizeSize := uint(prominentcolor.DefaultSize)
 	bgmasks := prominentcolor.GetDefaultMasks()
 
-	for i := 0; i < len(bitarr); i++ {
-		res, err := prominentcolor.KmeansWithAll(params, img, bitarr[i], resizeSize, bgmasks)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		//buff.WriteString(outputTitle(prefix + bitInfo(bitarr[i])))
-		buff.WriteString(outputColorRange(res))
+	res, err := prominentcolor.KmeansWithAll(3, img, prominentcolor.ArgumentDefault, resizeSize, bgmasks)
+	if err != nil {
+		log.Println(err)
 	}
 
-	return buff.String()
+	colors := Colors{getColors(res)}
+
+	return colors
 }
 
-func outputColorRange(colorRange []prominentcolor.ColorItem) string {
-	var buff strings.Builder
-	buff.WriteString("<table><tr>")
+func getColors(colorRange []prominentcolor.ColorItem) []string {
+	var colors []string
 
 	for _, color := range colorRange {
-		fmt.Println(color.AsString())
-		//fmt.Println(color.AsString(), color.AsString(), color.Cnt)
+		colors = append(colors, color.AsString())
 	}
 
-	buff.WriteString("</tr></table>")
-	return buff.String()
+	return colors
 }
 
 func getColorsFromImage(w http.ResponseWriter, r *http.Request) {
@@ -99,11 +61,11 @@ func getColorsFromImage(w http.ResponseWriter, r *http.Request) {
   bodyString := string(body)
 
   image, err := getImage(bodyString)
-  teste := processBatch(image)
-  fmt.Println(teste)
+  result := process(image)
 
-
-  w.Write([]byte("teste"))
+  colors, err := json.Marshal(result)
+  w.Header().Set("Content-Type", "application/json")
+  w.Write(colors)
 }
 
 func main() {
