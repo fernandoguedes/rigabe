@@ -7,14 +7,21 @@ import (
   "log"
   "image"
   _ "image/jpeg"
+  _ "image/gif"
+  _ "image/png"
   "strings"
   "encoding/json"
   prominentcolor "github.com/EdlinOrg/prominentcolor"
 )
 
-// An Color represents data result
-type Color struct {
+// An Response represents data result
+type Response struct {
 	Color []string `json:"colors"`
+}
+
+// An Request represents an image encoded by base64
+type Request struct {
+	Image string `json:"image"`
 }
 
 func getImage(data string) (image.Image, error) {
@@ -22,14 +29,13 @@ func getImage(data string) (image.Image, error) {
   img, _, err := image.Decode(reader)
 
   if err != nil {
-  	log.Fatal(err)
 	return nil, err
   }
 
   return img, nil
 }
 
-func process(img image.Image) Color {
+func process(img image.Image) Response {
 	resizeSize := uint(prominentcolor.DefaultSize)
 	bgmasks := prominentcolor.GetDefaultMasks()
 
@@ -38,7 +44,7 @@ func process(img image.Image) Color {
 		log.Println(err)
 	}
 
-	colors := Color{getColors(res)}
+	colors := Response{getColors(res)}
 
 	return colors
 }
@@ -61,9 +67,10 @@ func getColorsFromImage(w http.ResponseWriter, r *http.Request) {
   	return
   }
 
-  bodyString := string(body)
+  var request Request
+  json.Unmarshal([]byte(body), &request)
 
-  image, err := getImage(bodyString)
+  image, err := getImage(request.Image)
   result := process(image)
 
   colors, err := json.Marshal(result)
