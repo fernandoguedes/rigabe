@@ -9,6 +9,7 @@ import (
   _ "image/jpeg"
   _ "image/gif"
   _ "image/png"
+  "html/template"
   "strings"
   "encoding/json"
   prominentcolor "github.com/EdlinOrg/prominentcolor"
@@ -78,8 +79,14 @@ func getColorsFromImage(w http.ResponseWriter, r *http.Request) {
   w.Write(colors)
 }
 
+func index(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.Execute(w, nil)
+}
+
 func main() {
-  http.HandleFunc("/", getColorsFromImage)
+  http.HandleFunc("/upload", getColorsFromImage)
+  http.HandleFunc("/", index)
 
   if err := http.ListenAndServe(":8080", nil); err != nil {
     panic(err)

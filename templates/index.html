@@ -1,0 +1,105 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>RiGaBe</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+  <style type="text/css">
+    #header {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .color-block {
+      padding: 30px 10px;
+      text-align: center;
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="header">
+    <h3 class="title is-3"><span class="has-text-danger">Ri</span><span class="has-text-success">Ga</span><span class="has-text-link">Be</span></h3>
+    <h5 class="title is-5">Get predominant palette colors from image</h5>
+  </div>
+  <div class="columns is-vcentered">
+    <div class="column">
+      <div class="field">
+        <div class="file is-centered is-boxed is-success has-name">
+          <label class="file-label">
+            <input id="input-upload" class="file-input" type="file" name="image">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Upload File
+              </span>
+            </span>
+            <span id="file-name" class="file-name">
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="columns is-vcentered">
+    <div id="result" class="column">
+    </div>
+  </div>
+
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <script>
+    const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+    })
+
+    const uploadFile = async encodedFile => {
+      const rawResponse = await fetch('http://localhost:8080/upload', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ image: encodedFile })
+      });
+
+      return rawResponse.json();
+    }
+
+    const buildColorBlocks = colors => {
+      let htmlBlocks = ''
+
+      colors.forEach(color => {
+        htmlBlocks += `<div class="color-block" style="background-color: #${color}">#${color}</div>`
+      })
+
+      return htmlBlocks
+    }
+
+    const form = document.getElementById('input-upload')
+    form.addEventListener('change', async (e) => {
+      let file = e.srcElement.files[0]
+      if (file.type == 'image/jpeg') {
+        let divLoad = document.getElementById('file-name')
+        let divResult = document.getElementById('result')
+        divLoad.innerHTML = '<progress class="progress is-small is-success" max="100">Loading</progress>'
+        let response = await uploadFile(await toBase64(file))
+        divLoad.innerHTML = ''
+        divResult.innerHTML = buildColorBlocks(response.colors.reverse())
+      }
+    })
+  </script>
+</body>
+</html>
