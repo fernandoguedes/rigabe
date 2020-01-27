@@ -1,4 +1,4 @@
-package main
+package rigabe 
 
 import (
   "net/http"
@@ -59,7 +59,7 @@ func getColors(colorRange []prominentcolor.ColorItem) []string {
 	return colors
 }
 
-func getColorsFromImage(w http.ResponseWriter, r *http.Request) {
+func Rigabe(w http.ResponseWriter, r *http.Request) {
   body, err := ioutil.ReadAll(r.Body)
   defer r.Body.Close()
   if err != nil {
@@ -76,12 +76,4 @@ func getColorsFromImage(w http.ResponseWriter, r *http.Request) {
   colors, err := json.Marshal(result)
   w.Header().Set("Content-Type", "application/json")
   w.Write(colors)
-}
-
-func main() {
-  http.HandleFunc("/", getColorsFromImage)
-
-  if err := http.ListenAndServe(":8080", nil); err != nil {
-    panic(err)
-  }
 }
