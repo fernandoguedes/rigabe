@@ -41,4 +41,4 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
-        gcloud functions deploy Rigabe --runtime go111 --trigger-http --project lfernandoguedes
+        gcloud functions deploy rigabe --entry-point Rigabe --runtime go111 --trigger-http --project lfernandoguedes
