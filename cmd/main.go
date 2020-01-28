@@ -8,10 +8,10 @@ import (
 	"github.com/fernandoguedes/rgb-soccer"
 )
 
-const PORT = ":8081"
+const port = ":8081"
 
 func main() {
 	http.HandleFunc("/", rigabe.Rigabe)
 	fmt.Println("Listening on localhost:8080")
-	log.Fatal(http.ListenAndServe(PORT, nil))
+	log.Fatal(http.ListenAndServe(port, nil))
 }
