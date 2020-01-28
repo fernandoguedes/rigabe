@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"image"
+	// To image package understand jpeg/gif/png
 	_ "image/jpeg"
 	_ "image/gif"
 	_ "image/png"
